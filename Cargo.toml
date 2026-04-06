@@ -4,3 +4,35 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
+cortex-m-rt = "0.7.5"
+embassy-stm32 = { version = "0.5.0", features = [
+    "defmt", "unstable-pac", "stm32l476rg", "memory-x",
+    "time-driver-any", "exti", "chrono", "dual-bank",
+] }
+embassy-sync = { version = "0.7.2", features = ["defmt"] }
+embassy-executor = { version = "0.9.1", features = [
+    "arch-cortex-m", "executor-thread", "defmt",
+] }
+embassy-time = { version = "0.5.0", features = [
+    "defmt", "defmt-timestamp-uptime", "tick-hz-32_768",
+] }
+defmt = "1.0.1"
+defmt-rtt = "1.1.0"
+panic-probe = { version = "1.0.0", features = ["print-defmt"] }
+heapless = { version = "0.9.2", default-features = false }
+
+
+
+
+[[bin]]
+name = "bargraph"
+path = "src/bin/bargraph_example.rs"
+
+[[bin]]
+name = "gamepad"
+path = "src/bin/gamepad_example.rs"
+
+[[bin]]
+name = "encoder"
+path = src/bin/encoder_example.rs"
