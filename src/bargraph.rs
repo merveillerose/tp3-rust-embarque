@@ -1,6 +1,8 @@
-use embassy_stm32::gpio::{AnyPin, Level, Output, Speed};
-use embassy_stm32::Peri;
+use embassy_stm32::gpio::Output;
 use crate::bsp_ensea::BargraphPins;
+use embassy_sync::signal::Signal;
+use core::sync::atomic::{AtomicU32, Ordering};
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 
 pub struct Bargraph {
     leds: [Output<'static>; 8],
@@ -62,5 +64,14 @@ impl Bargraph {
         for led in self.leds.iter_mut() {
             led.set_high();
         }
+    }
+
+    pub async fn wait_and_update(&mut self, signal: &Signal<CriticalSectionRawMutex, ()>, value: &AtomicU32) {
+        loop {
+            signal.wait().await;
+            let val = value.load(Ordering::Relaxed) as i32;
+            self.set_value(val);
+        }
+
     }
 }

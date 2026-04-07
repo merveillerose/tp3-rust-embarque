@@ -2,6 +2,7 @@
 name = "td3"
 version = "0.1.0"
 edition = "2024"
+default-run = "main"
 
 [dependencies]
 cortex-m = { version = "0.7.7", features = ["critical-section-single-core"] }
@@ -21,9 +22,13 @@ defmt = "1.0.1"
 defmt-rtt = "1.1.0"
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
 heapless = { version = "0.9.2", default-features = false }
+embedded-hal = "0.2.7"
 
 
 
+[[bin]]
+name = "main"
+path = "src/main.rs"
 
 [[bin]]
 name = "bargraph"
@@ -35,4 +40,9 @@ path = "src/bin/gamepad_example.rs"
 
 [[bin]]
 name = "encoder"
-path = src/bin/encoder_example.rs"
+path = "src/bin/encoder_example.rs"
+
+[[bin]]
+name = "stepper"
+path = "src/bin/stepper_example.rs"
+

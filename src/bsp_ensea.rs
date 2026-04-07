@@ -1,14 +1,13 @@
-#![no_std]
-#![no_main]
 
-use embassy_stm32::gpio::{AnyPin, Input, Level, Output, OutputType, Speed};
+use embassy_stm32::gpio::{AnyPin, Input, Level, Output, Speed, Pull};
 use embassy_stm32::Peri;
+use embassy_stm32::peripherals::{PA0, PA1, PA6, TIM2, TIM3};
 
 pub struct Board{
     pub bargraph_pins: BargraphPins,
     pub steppers_pins: SteppersPins,
     pub gamepad: GamepadPins,
-    pub spi2: Spin2Pins,
+    pub spi2: Spi2Pins,
     pub gps: GPSPins,
     pub usart1: USART1Pins,
     pub usart2: USART2Pins,
@@ -17,6 +16,7 @@ pub struct Board{
     pub magneto: MagnetoPins,
     pub gpio: GPIOPins,
     pub connector: ConnectorPins,
+    
 }
 
 // Bargraph 8 LEDs
@@ -42,18 +42,20 @@ pub struct GamepadPins {
 
 // Encodeur rotatif
 pub struct EncoderPins {
-    pub ch_a:   Input<'static>,
-    pub ch_b: Input<'static>,
-    pub button: Input<'static>
+    pub ch_a:   Peri<'static, PA0>,
+    pub ch_b: Peri<'static, PA1>,
+    pub button: Input<'static>,
+    pub timer:  Peri<'static, TIM2>,
 }
 
 // 2 moteurs pas à pas
 pub struct SteppersPins {
     pub dir: Output<'static>,  
-    pub step: Output<'static>,
+    pub step: Peri<'static, PA6>,
     pub enable: Output<'static>,
     pub ms1: Output<'static>,
     pub ms2: Output<'static>,
+    pub timer: Peri<'static, TIM3>,
 }
 
 // SPI2 pour le lecteur de cartes SD
@@ -125,15 +127,17 @@ impl Board {
             },
             encoder: EncoderPins {
                 button: Input::new(p.PA15, Pull::Up),
-                ch_a:   Input::new(p.PA0, Pull::Up),
-                ch_b:   Input::new(p.PA1, Pull::Up),
+                ch_a:   p.PA0,
+                ch_b:   p.PA1,
+                timer:  p.TIM2.into(),
             },
             steppers_pins: SteppersPins {
                 dir:    Output::new(p.PA7, Level::Low, Speed::Low),
-                step:   Output::new(p.PA6, Level::Low, Speed::Low),
+                step:   p.PA6, 
                 enable: Output::new(p.PA12, Level::Low, Speed::Low),
                 ms1:    Output::new(p.PA11, Level::Low, Speed::Low),
                 ms2:    Output::new(p.PB12, Level::Low, Speed::Low),
+                timer:  p.TIM3.into(),
             },
             gps: GPSPins {
                 enable: Output::new(p.PB13, Level::Low, Speed::Low),
