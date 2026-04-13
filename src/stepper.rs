@@ -2,7 +2,7 @@ use embassy_stm32::gpio::{Output, OutputType};
 use embassy_stm32::timer::simple_pwm::{PwmPin, SimplePwm};
 use embassy_stm32::timer::Channel;
 use embassy_stm32::time::hz;
-use embassy_stm32::peripherals::{TIM3, PA6};
+use embassy_stm32::peripherals::TIM3;
 use embedded_hal::Pwm; // ← trait qui fournit enable/disable/set_duty/get_max_duty
 use crate::bsp_ensea::SteppersPins;
 

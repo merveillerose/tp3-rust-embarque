@@ -1,7 +1,14 @@
 
 use embassy_stm32::gpio::{AnyPin, Input, Level, Output, Speed, Pull};
 use embassy_stm32::Peri;
-use embassy_stm32::peripherals::{PA0, PA1, PA6, TIM2, TIM3};
+use embassy_stm32::peripherals::{PA0, PA1, PA6, TIM2, TIM3, I2C1, PB6, PB7};
+use embassy_stm32::interrupt::typelevel::EXTI15_10;
+use embassy_stm32::{bind_interrupts, exti::ExtiInput};
+
+bind_interrupts!(struct Irqs {
+    EXTI15_10 => embassy_stm32::exti::InterruptHandler<EXTI15_10>;
+});
+
 
 pub struct Board{
     pub bargraph_pins: BargraphPins,
@@ -16,7 +23,7 @@ pub struct Board{
     pub magneto: MagnetoPins,
     pub gpio: GPIOPins,
     pub connector: ConnectorPins,
-    
+    pub enc_button: ExtiInput<'static>,
 }
 
 // Bargraph 8 LEDs
@@ -44,7 +51,7 @@ pub struct GamepadPins {
 pub struct EncoderPins {
     pub ch_a:   Peri<'static, PA0>,
     pub ch_b: Peri<'static, PA1>,
-    pub button: Input<'static>,
+    //b button: Input<'static>,
     pub timer:  Peri<'static, TIM2>,
 }
 
@@ -80,9 +87,11 @@ pub struct USART2Pins {
     pub rx: Input<'static> // PA3
 }
 
+
 pub struct I2C1Pins {
-    pub scl: Output<'static>, // PB6
-    pub sda: Peri<'static, AnyPin> // PB7
+    pub peri: Peri<'static, I2C1>,
+    pub scl:  Peri<'static, PB6>,
+    pub sda:  Peri<'static, PB7>,
 }
 
 pub struct MagnetoPins {
@@ -126,11 +135,12 @@ impl Board {
                 btn_center: Input::new(p.PC5, Pull::Up),
             },
             encoder: EncoderPins {
-                button: Input::new(p.PA15, Pull::Up),
+                //button: Input::new(p.PA15, Pull::Up),
                 ch_a:   p.PA0,
                 ch_b:   p.PA1,
                 timer:  p.TIM2.into(),
             },
+            enc_button: ExtiInput::new(p.PA15, p.EXTI15, Pull::Up, Irqs),
             steppers_pins: SteppersPins {
                 dir:    Output::new(p.PA7, Level::Low, Speed::Low),
                 step:   p.PA6, 
@@ -157,8 +167,9 @@ impl Board {
                 cs:   Output::new(p.PC0, Level::High, Speed::Low),
             },
             i2c1: I2C1Pins {
-                scl: Output::new(p.PB6, Level::Low, Speed::Low),
-                sda: p.PB7.into(),
+                peri: p.I2C1,
+                scl:  p.PB6,
+                sda:  p.PB7,
             },
             magneto: MagnetoPins {
                 status: Input::new(p.PC1, Pull::Up),

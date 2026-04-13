@@ -5,3 +5,4 @@ pub mod bargraph;
 pub mod gamepad;
 pub mod encoder;
 pub mod stepper;
+pub mod oled;

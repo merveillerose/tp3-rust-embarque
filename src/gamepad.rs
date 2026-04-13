@@ -1,4 +1,3 @@
-use embassy_stm32::gpio::{Pull, Level, Input, Speed};
 use crate::bsp_ensea::GamepadPins;
 use defmt::Format;
 
@@ -35,22 +34,22 @@ impl Gamepad {
 
     pub fn is_pressed(&self, button: Button) -> bool {
         match button {
-            Button::Top => self.btn_top.is_low(),
-            Button::Bottom => self.btn_bottom.is_low(),
-            Button::Left => self.btn_left.is_low(),
-            Button::Right => self.btn_right.is_low(),
-            Button::Center => self.btn_center.is_low(),
+            Button::Top => self.pins.btn_top.is_low(),
+            Button::Bottom => self.pins.btn_bottom.is_low(),
+            Button::Left => self.pins.btn_left.is_low(),
+            Button::Right => self.pins.btn_right.is_low(),
+            Button::Center => self.pins.btn_center.is_low(),
         }
     }
     
     /// Lit l'état des boutons et retourne une structure GamepadState   
     pub fn poll(&self) -> GamepadState {
         GamepadState {
-            top: self.btn_top.is_low(),
-            bottom: self.btn_bottom.is_low(),
-            left: self.btn_left.is_low(),
-            right: self.btn_right.is_low(),
-            center: self.btn_center.is_low(),
+            top: self.pins.btn_top.is_low(),
+            bottom: self.pins.btn_bottom.is_low(),
+            left: self.pins.btn_left.is_low(),
+            right: self.pins.btn_right.is_low(),
+            center: self.pins.btn_center.is_low(),
         }
     }
 }
